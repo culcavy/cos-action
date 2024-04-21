@@ -80124,7 +80124,7 @@ run().catch(error => {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.process = exports.collectLocalFiles = void 0;
+exports.process = exports.collectLocalFiles = exports.listFilesOnCOS = void 0;
 const node_fs_1 = __nccwpck_require__(7561);
 const node_path_1 = __nccwpck_require__(9411);
 const node_process_1 = __nccwpck_require__(7742);
@@ -80189,6 +80189,7 @@ const listFilesOnCOS = (cos, nextMarker) => {
         });
     });
 };
+exports.listFilesOnCOS = listFilesOnCOS;
 /**
  * 获取目录下的所有文件
  *
@@ -80199,7 +80200,7 @@ const collectLocalFiles = async (root) => {
     const files = new Set();
     await walk(root, async (path) => {
         if (node_process_1.platform === 'win32') {
-            path = path.replace(node_path_1.win32.sep, node_path_1.posix.sep);
+            path = path.replaceAll(node_path_1.win32.sep, node_path_1.posix.sep);
         }
         let p = path.substring(root.length);
         for (; p[0] === '/';) {
@@ -80217,7 +80218,7 @@ const uploadFiles = async (cos, localFiles) => {
     for (const file of localFiles) {
         let key = (0, node_path_1.join)(cos.remotePath, file);
         if (node_process_1.platform == 'win32') {
-            key = key.replace(node_path_1.win32.sep, node_path_1.posix.sep);
+            key = key.replaceAll(node_path_1.win32.sep, node_path_1.posix.sep);
         }
         await uploadFileToCOS(cos, file, key);
         index++;
@@ -80230,7 +80231,7 @@ const collectRemoteFiles = async (cos) => {
     let data = null;
     let nextMarker = undefined;
     do {
-        data = await listFilesOnCOS(cos, nextMarker);
+        data = await (0, exports.listFilesOnCOS)(cos, nextMarker);
         for (const e of data.Contents) {
             let p = e.Key.substring(cos.remotePath.length);
             for (; p[0] === '/';) {

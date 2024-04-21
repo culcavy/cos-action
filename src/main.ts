@@ -1,6 +1,6 @@
 import COS, { GetBucketResult, PutObjectResult } from 'cos-nodejs-sdk-v5'
 import { promises, createReadStream } from 'node:fs'
-import { join, posix, win32, normalize } from 'node:path'
+import { join, posix, win32, normalize, sep } from 'node:path'
 import { platform } from 'node:process'
 
 export interface TCOS {
@@ -64,7 +64,7 @@ const deleteFileFromCOS = (cos: TCOS, path: string) => {
   })
 }
 
-const listFilesOnCOS = (cos: TCOS, nextMarker?: string) => {
+export const listFilesOnCOS = (cos: TCOS, nextMarker?: string) => {
   return new Promise<GetBucketResult>((resolve, reject) => {
     cos.cli.getBucket(
       {
@@ -94,7 +94,7 @@ export const collectLocalFiles = async (root: string) => {
   const files = new Set<string>()
   await walk(root, async (path: string) => {
     if (platform === 'win32') {
-      path = path.replace(win32.sep, posix.sep)
+      path = path.replaceAll(win32.sep, posix.sep)
     }
     let p = path.substring(root.length)
     for (; p[0] === '/'; ) {
@@ -112,7 +112,7 @@ const uploadFiles = async (cos: TCOS, localFiles: Set<string>) => {
   for (const file of localFiles) {
     let key = join(cos.remotePath, file)
     if (platform == 'win32') {
-      key = key.replace(win32.sep, posix.sep)
+      key = key.replaceAll(win32.sep, posix.sep)
     }
     await uploadFileToCOS(cos, file, key)
     index++
