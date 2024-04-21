@@ -1,4 +1,4 @@
-import COS from 'cos-nodejs-sdk-v5'
+import COS, { CosSdkError } from 'cos-nodejs-sdk-v5'
 import { TCOS, process } from './main'
 import * as core from '@actions/core'
 
@@ -26,5 +26,10 @@ const run = async () => {
 }
 
 run().catch(error => {
-  if (error instanceof Error) core.setFailed(error.message)
+  if (error instanceof Error) {
+    core.setFailed(error.message)
+  } else {
+    const err = error as CosSdkError
+    core.setFailed(`[${err.code}] ${err.message}`)
+  }
 })

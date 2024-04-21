@@ -80106,8 +80106,13 @@ const run = async () => {
     core.debug(new Date().toTimeString());
 };
 run().catch(error => {
-    if (error instanceof Error)
+    if (error instanceof Error) {
         core.setFailed(error.message);
+    }
+    else {
+        const err = error;
+        core.setFailed(`[${err.code}] ${err.message}`);
+    }
 });
 
 
