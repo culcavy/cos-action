@@ -1,7 +1,7 @@
 import core from '@actions/core'
 import COS, { CosSdkError, GetBucketResult } from 'cos-nodejs-sdk-v5'
-import { promises, createReadStream } from 'fs'
-import Path from 'path'
+import { promises, createReadStream } from 'node:fs'
+import { parse, join } from 'node:path'
 
 const cos = {
   cli: new COS({
@@ -29,7 +29,7 @@ const walk = async (path: string, walkFn: (path: string) => Promise<void>) => {
 
   const dir = await promises.opendir(path)
   for await (const dirent of dir) {
-    await walk(Path.join(path, dirent.name), walkFn)
+    await walk(join(path, dirent.name), walkFn)
   }
 }
 
@@ -39,9 +39,9 @@ const uploadFileToCOS = (cos: TCOS, path: string) => {
       {
         Bucket: cos.bucket,
         Region: cos.region,
-        Key: Path.join(cos.remotePath, path),
+        Key: join(cos.remotePath, path),
         StorageClass: 'STANDARD',
-        Body: createReadStream(Path.join(cos.localPath, path))
+        Body: createReadStream(join(cos.localPath, path))
       },
       (err, data) => {
         if (err) {
@@ -60,7 +60,7 @@ const deleteFileFromCOS = (cos: TCOS, path: string) => {
       {
         Bucket: cos.bucket,
         Region: cos.region,
-        Key: Path.join(cos.remotePath, path)
+        Key: join(cos.remotePath, path)
       },
       (err, data) => {
         if (err) {
@@ -98,7 +98,7 @@ const collectLocalFiles = async (cos: TCOS) => {
   const files = new Set<string>()
   await walk(root, async (path: string) => {
     let p = path.substring(root.length)
-    for (; p[0] === '/'; ) {
+    for (; p[0] === '/';) {
       p = p.substring(1)
     }
     files.add(p)
@@ -115,7 +115,7 @@ const uploadFiles = async (cos: TCOS, localFiles: Set<string>) => {
     index++
     percent = (index / size) * 100
     console.log(
-      `>> [${index}/${size}, ${percent}%] uploaded ${Path.join(cos.localPath, file)}`
+      `>> [${index}/${size}, ${percent}%] uploaded ${join(cos.localPath, file)}`
     )
   }
 }
@@ -129,7 +129,7 @@ const collectRemoteFiles = async (cos: TCOS) => {
     data = await listFilesOnCOS(cos, nextMarker)
     for (const e of data.Contents) {
       let p = e.Key.substring(cos.remotePath.length)
-      for (; p[0] === '/'; ) {
+      for (; p[0] === '/';) {
         p = p.substring(1)
       }
       files.add(p)
@@ -162,7 +162,7 @@ const cleanDeleteFiles = async (cos: TCOS, deleteFiles: Set<string>) => {
     index++
     percent = (index / size) * 100
     console.log(
-      `>> [${index}/${size}, ${percent}%] cleaned ${Path.join(cos.remotePath, file)}`
+      `>> [${index}/${size}, ${percent}%] cleaned ${join(cos.remotePath, file)}`
     )
   }
 }
