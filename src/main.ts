@@ -1,6 +1,7 @@
 import COS, { GetBucketResult } from 'cos-nodejs-sdk-v5'
 import { promises, createReadStream } from 'node:fs'
-import { join } from 'node:path'
+import { join, sep, posix, win32, normalize, parse } from 'node:path'
+import { platform } from 'node:process';
 
 export interface TCOS {
   cli: COS;
@@ -90,13 +91,16 @@ const listFilesOnCOS = (cos: TCOS, nextMarker?: string) => {
  * @returns 该目录下的所有文件
  */
 export const collectLocalFiles = async (root: string) => {
+  root = normalize(root)
   const files = new Set<string>()
   await walk(root, async (path: string) => {
+    if(platform === "win32") {
+      path = path.replace(win32.sep, posix.sep)
+    }
     let p = path.substring(root.length)
     for (; p[0] === '/';) {
       p = p.substring(1)
     }
-    files.add(p)
   })
   return files
 }

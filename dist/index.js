@@ -80060,8 +80060,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __importDefault(__nccwpck_require__(2186));
 const cos_nodejs_sdk_v5_1 = __importDefault(__nccwpck_require__(598));
-const fs_1 = __nccwpck_require__(7147);
-const path_1 = __importDefault(__nccwpck_require__(1017));
+const node_fs_1 = __nccwpck_require__(7561);
+const node_path_1 = __nccwpck_require__(9411);
 const cos = {
     cli: new cos_nodejs_sdk_v5_1.default({
         SecretId: core_1.default.getInput('secret_id'),
@@ -80077,13 +80077,13 @@ const cos = {
     clean: core_1.default.getInput('clean') === 'true'
 };
 const walk = async (path, walkFn) => {
-    const stats = await fs_1.promises.lstat(path);
+    const stats = await node_fs_1.promises.lstat(path);
     if (!stats.isDirectory()) {
         return await walkFn(path);
     }
-    const dir = await fs_1.promises.opendir(path);
+    const dir = await node_fs_1.promises.opendir(path);
     for await (const dirent of dir) {
-        await walk(path_1.default.join(path, dirent.name), walkFn);
+        await walk((0, node_path_1.join)(path, dirent.name), walkFn);
     }
 };
 const uploadFileToCOS = (cos, path) => {
@@ -80091,9 +80091,9 @@ const uploadFileToCOS = (cos, path) => {
         cos.cli.putObject({
             Bucket: cos.bucket,
             Region: cos.region,
-            Key: path_1.default.join(cos.remotePath, path),
+            Key: (0, node_path_1.join)(cos.remotePath, path),
             StorageClass: 'STANDARD',
-            Body: (0, fs_1.createReadStream)(path_1.default.join(cos.localPath, path))
+            Body: (0, node_fs_1.createReadStream)((0, node_path_1.join)(cos.localPath, path))
         }, (err, data) => {
             if (err) {
                 return reject(err);
@@ -80109,7 +80109,7 @@ const deleteFileFromCOS = (cos, path) => {
         cos.cli.deleteObject({
             Bucket: cos.bucket,
             Region: cos.region,
-            Key: path_1.default.join(cos.remotePath, path)
+            Key: (0, node_path_1.join)(cos.remotePath, path)
         }, (err, data) => {
             if (err) {
                 return reject(err);
@@ -80157,7 +80157,7 @@ const uploadFiles = async (cos, localFiles) => {
         await uploadFileToCOS(cos, file);
         index++;
         percent = (index / size) * 100;
-        console.log(`>> [${index}/${size}, ${percent}%] uploaded ${path_1.default.join(cos.localPath, file)}`);
+        console.log(`>> [${index}/${size}, ${percent}%] uploaded ${(0, node_path_1.join)(cos.localPath, file)}`);
     }
 };
 const collectRemoteFiles = async (cos) => {
@@ -80194,7 +80194,7 @@ const cleanDeleteFiles = async (cos, deleteFiles) => {
         await deleteFileFromCOS(cos, file);
         index++;
         percent = (index / size) * 100;
-        console.log(`>> [${index}/${size}, ${percent}%] cleaned ${path_1.default.join(cos.remotePath, file)}`);
+        console.log(`>> [${index}/${size}, ${percent}%] cleaned ${(0, node_path_1.join)(cos.remotePath, file)}`);
     }
 };
 const process = async (cos) => {
@@ -80330,6 +80330,22 @@ module.exports = require("net");
 
 "use strict";
 module.exports = require("node:events");
+
+/***/ }),
+
+/***/ 7561:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs");
+
+/***/ }),
+
+/***/ 9411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 
