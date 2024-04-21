@@ -7,7 +7,8 @@
     "bundle": "npm run format:write && npm run package",
     "format:write": "prettier --write .",
     "package": "ncc build src/index.ts -o dist --source-map --license licenses.txt",
-    "test": "jest"
+    "test": "jest",
+    "release": "npm run bundle && git add . && git commit -m 'chore: release new version' && git push && bash script/release"
   },
   "exports": {
     ".": "./dist/index.js"

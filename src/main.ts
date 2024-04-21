@@ -117,9 +117,7 @@ const uploadFiles = async (cos: TCOS, localFiles: Set<string>) => {
     await uploadFileToCOS(cos, file, key)
     index++
     percent = (index / size) * 100
-    console.log(
-      `>> [${index}/${size}, ${percent}%] uploaded ${join(cos.localPath, file)}`
-    )
+    console.log(`>> [${index}/${size}, ${percent}%] uploaded ${key}`)
   }
 }
 
