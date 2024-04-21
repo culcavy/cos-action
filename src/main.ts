@@ -25,6 +25,10 @@ const walk = async (path: string, walkFn: (path: string) => Promise<void>) => {
 }
 
 const uploadFileToCOS = (cos: TCOS, path: string) => {
+  let key = join(cos.remotePath, path)
+  if (platform == 'win32') {
+    key = key.replace(win32.sep, posix.sep)
+  }
   return new Promise((resolve, reject) => {
     cos.cli.putObject(
       {
