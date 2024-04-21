@@ -109,16 +109,29 @@ const uploadFiles = async (cos: TCOS, localFiles: Set<string>) => {
   const size = localFiles.size
   let index = 0
   let percent = 0
+  const allp: Promise<COS.PutObjectResult | undefined>[] = []
   for (const file of localFiles) {
     let key = join(cos.remotePath, file)
     if (platform == 'win32') {
       key = key.replaceAll(win32.sep, posix.sep)
     }
-    await uploadFileToCOS(cos, file, key)
-    index++
-    percent = (index / size) * 100
-    console.log(`>> [${index}/${size}, ${percent}%] uploaded ${key}`)
+    allp.push(
+      (async () => {
+        for (let i = 0; i < 3; i++) {
+          try {
+            const res = await uploadFileToCOS(cos, file, key)
+            index++
+            percent = (index / size) * 100
+            console.log(`>> [${index}/${size}, ${percent}%] uploaded ${key}`)
+            return res
+          } catch (e) {
+            console.error(e)
+          }
+        }
+      })()
+    )
   }
+  await Promise.all(allp)
 }
 
 const collectRemoteFiles = async (cos: TCOS) => {

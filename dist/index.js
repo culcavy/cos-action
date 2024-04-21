@@ -80215,16 +80215,28 @@ const uploadFiles = async (cos, localFiles) => {
     const size = localFiles.size;
     let index = 0;
     let percent = 0;
+    const allp = [];
     for (const file of localFiles) {
         let key = (0, node_path_1.join)(cos.remotePath, file);
         if (node_process_1.platform == 'win32') {
             key = key.replaceAll(node_path_1.win32.sep, node_path_1.posix.sep);
         }
-        await uploadFileToCOS(cos, file, key);
-        index++;
-        percent = (index / size) * 100;
-        console.log(`>> [${index}/${size}, ${percent}%] uploaded ${key}`);
+        allp.push((async () => {
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const res = await uploadFileToCOS(cos, file, key);
+                    index++;
+                    percent = (index / size) * 100;
+                    console.log(`>> [${index}/${size}, ${percent}%] uploaded ${key}`);
+                    return res;
+                }
+                catch (e) {
+                    console.error(e);
+                }
+            }
+        })());
     }
+    await Promise.all(allp);
 };
 const collectRemoteFiles = async (cos) => {
     const files = new Set();
