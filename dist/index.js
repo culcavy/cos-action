@@ -80134,6 +80134,10 @@ const walk = async (path, walkFn) => {
     }
 };
 const uploadFileToCOS = (cos, path) => {
+    let key = (0, node_path_1.join)(cos.remotePath, path);
+    if (node_process_1.platform == 'win32') {
+        key = key.replace(node_path_1.win32.sep, node_path_1.posix.sep);
+    }
     return new Promise((resolve, reject) => {
         cos.cli.putObject({
             Bucket: cos.bucket,
