@@ -8925,7 +8925,7 @@ exports.NOOP = NOOP;
 
 /***/ }),
 
-/***/ 1074:
+/***/ 5356:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -11073,7 +11073,7 @@ const dotProp = __nccwpck_require__(2042);
 const makeDir = __nccwpck_require__(9126);
 const pkgUp = __nccwpck_require__(4586);
 const envPaths = __nccwpck_require__(347);
-const atomically = __nccwpck_require__(1074);
+const atomically = __nccwpck_require__(5356);
 const ajv_1 = __nccwpck_require__(2426);
 const ajv_formats_1 = __nccwpck_require__(567);
 const debounceFn = __nccwpck_require__(1931);
@@ -62545,7 +62545,7 @@ async function * convertIterableToBuffer (iterable) {
 let ReadableStream
 function ReadableStreamFrom (iterable) {
   if (!ReadableStream) {
-    ReadableStream = (__nccwpck_require__(5356).ReadableStream)
+    ReadableStream = (__nccwpck_require__(4544).ReadableStream)
   }
 
   if (ReadableStream.from) {
@@ -62956,7 +62956,7 @@ const textDecoder = new TextDecoder()
 // https://fetch.spec.whatwg.org/#concept-bodyinit-extract
 function extractBody (object, keepalive = false) {
   if (!ReadableStream) {
-    ReadableStream = (__nccwpck_require__(5356).ReadableStream)
+    ReadableStream = (__nccwpck_require__(4544).ReadableStream)
   }
 
   // 1. Let stream be null.
@@ -63177,7 +63177,7 @@ function extractBody (object, keepalive = false) {
 function safelyExtractBody (object, keepalive = false) {
   if (!ReadableStream) {
     // istanbul ignore next
-    ReadableStream = (__nccwpck_require__(5356).ReadableStream)
+    ReadableStream = (__nccwpck_require__(4544).ReadableStream)
   }
 
   // To safely extract a body and a `Content-Type` value from
@@ -65658,7 +65658,7 @@ const EE = __nccwpck_require__(2361)
 const { Readable, pipeline } = __nccwpck_require__(2781)
 const { addAbortListener, isErrored, isReadable, nodeMajor, nodeMinor } = __nccwpck_require__(3983)
 const { dataURLProcessor, serializeAMimeType } = __nccwpck_require__(685)
-const { TransformStream } = __nccwpck_require__(5356)
+const { TransformStream } = __nccwpck_require__(4544)
 const { getGlobalDispatcher } = __nccwpck_require__(1892)
 const { webidl } = __nccwpck_require__(1744)
 const { STATUS_CODES } = __nccwpck_require__(3685)
@@ -67402,7 +67402,7 @@ async function httpNetworkFetch (
   // cancelAlgorithm set to cancelAlgorithm, highWaterMark set to
   // highWaterMark, and sizeAlgorithm set to sizeAlgorithm.
   if (!ReadableStream) {
-    ReadableStream = (__nccwpck_require__(5356).ReadableStream)
+    ReadableStream = (__nccwpck_require__(4544).ReadableStream)
   }
 
   const stream = new ReadableStream(
@@ -68273,7 +68273,7 @@ class Request {
 
       // 2. Set finalBody to the result of creating a proxy for inputBody.
       if (!TransformStream) {
-        TransformStream = (__nccwpck_require__(5356).TransformStream)
+        TransformStream = (__nccwpck_require__(4544).TransformStream)
       }
 
       // https://streams.spec.whatwg.org/#readablestream-create-a-proxy
@@ -68737,7 +68737,7 @@ const { kHeadersList, kConstruct } = __nccwpck_require__(2785)
 const assert = __nccwpck_require__(9491)
 const { types } = __nccwpck_require__(3837)
 
-const ReadableStream = globalThis.ReadableStream || (__nccwpck_require__(5356).ReadableStream)
+const ReadableStream = globalThis.ReadableStream || (__nccwpck_require__(4544).ReadableStream)
 const textEncoder = new TextEncoder('utf-8')
 
 // https://fetch.spec.whatwg.org/#response-class
@@ -70274,7 +70274,7 @@ let ReadableStream = globalThis.ReadableStream
 
 function isReadableStreamLike (stream) {
   if (!ReadableStream) {
-    ReadableStream = (__nccwpck_require__(5356).ReadableStream)
+    ReadableStream = (__nccwpck_require__(4544).ReadableStream)
   }
 
   return stream instanceof ReadableStream || (
@@ -80058,24 +80058,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__nccwpck_require__(2186));
 const cos_nodejs_sdk_v5_1 = __importDefault(__nccwpck_require__(598));
+const main_1 = __nccwpck_require__(399);
+const core_1 = __importDefault(__nccwpck_require__(2186));
+try {
+    const cos = {
+        cli: new cos_nodejs_sdk_v5_1.default({
+            SecretId: core_1.default.getInput('secret_id'),
+            SecretKey: core_1.default.getInput('secret_key'),
+            Domain: core_1.default.getInput('accelerate') === 'true'
+                ? '{Bucket}.cos.accelerate.myqcloud.com'
+                : undefined
+        }),
+        bucket: core_1.default.getInput('cos_bucket'),
+        region: core_1.default.getInput('cos_region'),
+        localPath: core_1.default.getInput('local_path'),
+        remotePath: core_1.default.getInput('remote_path'),
+        clean: core_1.default.getInput('clean') === 'true'
+    };
+    (0, main_1.process)(cos).catch(reason => {
+        core_1.default.setFailed(`fail to upload files to cos: ${reason.message}`);
+    });
+}
+catch (err) {
+    core_1.default.setFailed(`fail to upload files to cos: ${err}`);
+}
+
+
+/***/ }),
+
+/***/ 399:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.process = exports.collectLocalFiles = void 0;
 const node_fs_1 = __nccwpck_require__(7561);
 const node_path_1 = __nccwpck_require__(9411);
-const cos = {
-    cli: new cos_nodejs_sdk_v5_1.default({
-        SecretId: core_1.default.getInput('secret_id'),
-        SecretKey: core_1.default.getInput('secret_key'),
-        Domain: core_1.default.getInput('accelerate') === 'true'
-            ? '{Bucket}.cos.accelerate.myqcloud.com'
-            : undefined
-    }),
-    bucket: core_1.default.getInput('cos_bucket'),
-    region: core_1.default.getInput('cos_region'),
-    localPath: core_1.default.getInput('local_path'),
-    remotePath: core_1.default.getInput('remote_path'),
-    clean: core_1.default.getInput('clean') === 'true'
-};
+const node_process_1 = __nccwpck_require__(7742);
 const walk = async (path, walkFn) => {
     const stats = await node_fs_1.promises.lstat(path);
     if (!stats.isDirectory()) {
@@ -80137,18 +80158,27 @@ const listFilesOnCOS = (cos, nextMarker) => {
         });
     });
 };
-const collectLocalFiles = async (cos) => {
-    const root = cos.localPath;
+/**
+ * 获取目录下的所有文件
+ *
+ * @param root 目录
+ * @returns 该目录下的所有文件
+ */
+const collectLocalFiles = async (root) => {
+    root = (0, node_path_1.normalize)(root);
     const files = new Set();
     await walk(root, async (path) => {
+        if (node_process_1.platform === 'win32') {
+            path = path.replace(node_path_1.win32.sep, node_path_1.posix.sep);
+        }
         let p = path.substring(root.length);
         for (; p[0] === '/';) {
             p = p.substring(1);
         }
-        files.add(p);
     });
     return files;
 };
+exports.collectLocalFiles = collectLocalFiles;
 const uploadFiles = async (cos, localFiles) => {
     const size = localFiles.size;
     let index = 0;
@@ -80198,7 +80228,7 @@ const cleanDeleteFiles = async (cos, deleteFiles) => {
     }
 };
 const process = async (cos) => {
-    const localFiles = await collectLocalFiles(cos);
+    const localFiles = await (0, exports.collectLocalFiles)(cos.localPath);
     console.log(localFiles.size, 'files to be uploaded');
     await uploadFiles(cos, localFiles);
     let cleanedFilesCount = 0;
@@ -80217,14 +80247,7 @@ const process = async (cos) => {
     }
     console.log(`uploaded ${localFiles.size} files${cleanedFilesMessage}`);
 };
-try {
-    process(cos).catch(reason => {
-        core_1.default.setFailed(`fail to upload files to cos: ${reason.message}`);
-    });
-}
-catch (err) {
-    core_1.default.setFailed(`fail to upload files to cos: ${err}`);
-}
+exports.process = process;
 
 
 /***/ }),
@@ -80349,6 +80372,14 @@ module.exports = require("node:path");
 
 /***/ }),
 
+/***/ 7742:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:process");
+
+/***/ }),
+
 /***/ 4492:
 /***/ ((module) => {
 
@@ -80413,7 +80444,7 @@ module.exports = require("stream");
 
 /***/ }),
 
-/***/ 5356:
+/***/ 4544:
 /***/ ((module) => {
 
 "use strict";

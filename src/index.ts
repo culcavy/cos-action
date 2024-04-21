@@ -1,5 +1,5 @@
-import COS from "cos-nodejs-sdk-v5"
-import { TCOS, process } from "./main"
+import COS from 'cos-nodejs-sdk-v5'
+import { TCOS, process } from './main'
 import core from '@actions/core'
 
 try {
