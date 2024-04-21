@@ -80191,7 +80191,6 @@ const listFilesOnCOS = (cos, nextMarker) => {
  * @returns 该目录下的所有文件
  */
 const collectLocalFiles = async (root) => {
-    root = (0, node_path_1.normalize)(root);
     const files = new Set();
     await walk(root, async (path) => {
         if (node_process_1.platform === 'win32') {
@@ -80201,6 +80200,7 @@ const collectLocalFiles = async (root) => {
         for (; p[0] === '/';) {
             p = p.substring(1);
         }
+        files.add(p);
     });
     return files;
 };
