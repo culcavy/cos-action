@@ -80133,11 +80133,7 @@ const walk = async (path, walkFn) => {
         await walk((0, node_path_1.join)(path, dirent.name), walkFn);
     }
 };
-const uploadFileToCOS = (cos, path) => {
-    let key = (0, node_path_1.join)(cos.remotePath, path);
-    if (node_process_1.platform == 'win32') {
-        key = key.replace(node_path_1.win32.sep, node_path_1.posix.sep);
-    }
+const uploadFileToCOS = (cos, path, key) => {
     return new Promise((resolve, reject) => {
         cos.cli.putObject({
             Bucket: cos.bucket,
@@ -80214,7 +80210,11 @@ const uploadFiles = async (cos, localFiles) => {
     let index = 0;
     let percent = 0;
     for (const file of localFiles) {
-        await uploadFileToCOS(cos, file);
+        let key = (0, node_path_1.join)(cos.remotePath, file);
+        if (node_process_1.platform == 'win32') {
+            key = key.replace(node_path_1.win32.sep, node_path_1.posix.sep);
+        }
+        await uploadFileToCOS(cos, file, key);
         index++;
         percent = (index / size) * 100;
         console.log(`>> [${index}/${size}, ${percent}%] uploaded ${(0, node_path_1.join)(cos.localPath, file)}`);

@@ -1,4 +1,4 @@
-import COS, { GetBucketResult } from 'cos-nodejs-sdk-v5'
+import COS, { GetBucketResult, PutObjectResult } from 'cos-nodejs-sdk-v5'
 import { promises, createReadStream } from 'node:fs'
 import { join, posix, win32, normalize } from 'node:path'
 import { platform } from 'node:process'
@@ -24,12 +24,8 @@ const walk = async (path: string, walkFn: (path: string) => Promise<void>) => {
   }
 }
 
-const uploadFileToCOS = (cos: TCOS, path: string) => {
-  let key = join(cos.remotePath, path)
-  if (platform == 'win32') {
-    key = key.replace(win32.sep, posix.sep)
-  }
-  return new Promise((resolve, reject) => {
+const uploadFileToCOS = (cos: TCOS, path: string, key: string) => {
+  return new Promise<PutObjectResult>((resolve, reject) => {
     cos.cli.putObject(
       {
         Bucket: cos.bucket,
@@ -114,7 +110,11 @@ const uploadFiles = async (cos: TCOS, localFiles: Set<string>) => {
   let index = 0
   let percent = 0
   for (const file of localFiles) {
-    await uploadFileToCOS(cos, file)
+    let key = join(cos.remotePath, file)
+    if (platform == 'win32') {
+      key = key.replace(win32.sep, posix.sep)
+    }
+    await uploadFileToCOS(cos, file, key)
     index++
     percent = (index / size) * 100
     console.log(
