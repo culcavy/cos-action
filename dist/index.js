@@ -80054,35 +80054,61 @@ try {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const cos_nodejs_sdk_v5_1 = __importDefault(__nccwpck_require__(598));
 const main_1 = __nccwpck_require__(399);
-const core_1 = __importDefault(__nccwpck_require__(2186));
-try {
+const core = __importStar(__nccwpck_require__(2186));
+const run = async () => {
+    const ms = core.getInput('milliseconds');
+    core.debug(`Waiting ${ms} milliseconds ...`);
+    core.debug(new Date().toTimeString());
     const cos = {
         cli: new cos_nodejs_sdk_v5_1.default({
-            SecretId: core_1.default.getInput('secret_id'),
-            SecretKey: core_1.default.getInput('secret_key'),
-            Domain: core_1.default.getInput('accelerate') === 'true'
+            SecretId: core.getInput('secret_id'),
+            SecretKey: core.getInput('secret_key'),
+            Domain: core.getInput('accelerate') === 'true'
                 ? '{Bucket}.cos.accelerate.myqcloud.com'
                 : undefined
         }),
-        bucket: core_1.default.getInput('cos_bucket'),
-        region: core_1.default.getInput('cos_region'),
-        localPath: core_1.default.getInput('local_path'),
-        remotePath: core_1.default.getInput('remote_path'),
-        clean: core_1.default.getInput('clean') === 'true'
+        bucket: core.getInput('cos_bucket'),
+        region: core.getInput('cos_region'),
+        localPath: core.getInput('local_path'),
+        remotePath: core.getInput('remote_path'),
+        clean: core.getInput('clean') === 'true'
     };
-    (0, main_1.process)(cos).catch(reason => {
-        core_1.default.setFailed(`fail to upload files to cos: ${reason.message}`);
-    });
-}
-catch (err) {
-    core_1.default.setFailed(`fail to upload files to cos: ${err}`);
-}
+    await (0, main_1.process)(cos);
+    core.debug(new Date().toTimeString());
+};
+run().catch(error => {
+    if (error instanceof Error)
+        core.setFailed(error.message);
+});
 
 
 /***/ }),

@@ -1,8 +1,11 @@
 import COS from 'cos-nodejs-sdk-v5'
 import { TCOS, process } from './main'
-import core from '@actions/core'
+import * as core from '@actions/core'
 
-try {
+const run = async () => {
+  const ms: string = core.getInput('milliseconds')
+  core.debug(`Waiting ${ms} milliseconds ...`)
+  core.debug(new Date().toTimeString())
   const cos: TCOS = {
     cli: new COS({
       SecretId: core.getInput('secret_id'),
@@ -18,9 +21,10 @@ try {
     remotePath: core.getInput('remote_path'),
     clean: core.getInput('clean') === 'true'
   }
-  process(cos).catch(reason => {
-    core.setFailed(`fail to upload files to cos: ${reason.message}`)
-  })
-} catch (err) {
-  core.setFailed(`fail to upload files to cos: ${err}`)
+  await process(cos)
+  core.debug(new Date().toTimeString())
 }
+
+run().catch(error => {
+  if (error instanceof Error) core.setFailed(error.message)
+})
