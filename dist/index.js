@@ -80142,7 +80142,7 @@ const uploadFileToCOS = (cos, path) => {
         cos.cli.putObject({
             Bucket: cos.bucket,
             Region: cos.region,
-            Key: (0, node_path_1.join)(cos.remotePath, path),
+            Key: key,
             StorageClass: 'STANDARD',
             Body: (0, node_fs_1.createReadStream)((0, node_path_1.join)(cos.localPath, path))
         }, (err, data) => {

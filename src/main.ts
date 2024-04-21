@@ -34,7 +34,7 @@ const uploadFileToCOS = (cos: TCOS, path: string) => {
       {
         Bucket: cos.bucket,
         Region: cos.region,
-        Key: join(cos.remotePath, path),
+        Key: key,
         StorageClass: 'STANDARD',
         Body: createReadStream(join(cos.localPath, path))
       },
