@@ -80217,7 +80217,7 @@ const uploadFiles = async (cos, localFiles) => {
         await uploadFileToCOS(cos, file, key);
         index++;
         percent = (index / size) * 100;
-        console.log(`>> [${index}/${size}, ${percent}%] uploaded ${(0, node_path_1.join)(cos.localPath, file)}`);
+        console.log(`>> [${index}/${size}, ${percent}%] uploaded ${key}`);
     }
 };
 const collectRemoteFiles = async (cos) => {
